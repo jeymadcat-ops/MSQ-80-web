@@ -454,7 +454,7 @@
     });
 
     // ---- the demos: a project of each, in this page (then it can be played here or sent); a second press within 3 s does it, so that a click by chance loses nothing
-    [['demoNeon', 2, 'NEON GRID'], ['demoTribe', 0, 'TRIBE'], ['demoAcid', 1, 'ACID BREAK']].forEach(function (d) {
+    [['demoNeon', 1, 'NEON GRID'], ['demoAcid', 0, 'ACID BREAK'], ['demoIron', 2, 'IRON HALL'], ['demoMotor', 3, 'MOTOR CITY']].forEach(function (d) {
       var btn = $(d[0]), armed = 0;
       btn.addEventListener('click', function () {
         if (!armed) {
