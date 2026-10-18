@@ -6,62 +6,27 @@
 <meta name="theme-color" content="#0a0c16">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>MSQ-80 Synth</title>
+<title>MSQ-80 Editor</title>
+<meta name="description" content="MSQ-80, a synth and drum machine with a sequencer: play it here, and send projects and demos to the M-VAVE FM-1 over USB.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app">
+<div id="app" data-tab="device">
   <header>
-    <div class="brand"><b>MSQ-80</b> <span id="ver"></span></div>
+    <div class="brand"><b>MSQ-80</b> <span id="ver"></span> <small class="tag">EDITOR</small></div>
     <div class="views" role="group" aria-label="View">
-      <button class="btn small" id="btnFull" type="button" aria-label="Full screen" title="Full screen" hidden>⛶</button>
       <button class="btn small" id="btnTheme" type="button">THEME</button>
-      <button class="btn small" id="vPanel" type="button">PANEL</button>
-      <button class="btn small" id="vTouch" type="button">TOUCH</button>
+      <button class="btn small viewonly" id="vPanel" type="button">PANEL</button>
+      <button class="btn small viewonly" id="vTouch" type="button">TOUCH</button>
     </div>
   </header>
 
-  <div id="touchview">
-    <div id="screenwrap">
-      <canvas id="screen" width="240" height="240"></canvas>
-      <button class="js-start" id="start" type="button">TAP TO START</button>
-    </div>
-
-    <nav id="pages" aria-label="Pages"></nav>
-
-    <section id="transport" aria-label="Transport"></section>
-
-    <nav id="decktabs" aria-label="Controls">
-      <button class="btn small" type="button" data-deck="nav">NAV</button>
-      <button class="btn small" type="button" data-deck="func">FUNC</button>
-      <button class="btn small" type="button" data-deck="keys" id="tabKeys">KEYS</button>
-      <button class="btn small" type="button" data-deck="file">FILE</button>
-    </nav>
-
-    <div id="deck">
-      <section id="nav" data-deck="nav" aria-label="Navigation">
-        <div id="dpad"></div>
-        <div id="mods"></div>
-      </section>
-
-      <section id="func" data-deck="func" aria-label="Raccourcis">
-        <div id="shortcuts"></div>
-        <button class="btn small" id="more" type="button">MORE</button>
-      </section>
-
-      <section id="keys" data-deck="keys" aria-label="Clavier">
-        <div id="pianobar"></div>
-        <div id="piano"></div>
-        <div id="pads"></div>
-      </section>
-
-      <div id="deckfile" data-deck="file"></div>
-    </div>
-  </div>
-
-  <div id="panelview" hidden>
-    <div id="stage"><div id="device"></div></div>
-  </div>
+  <nav id="tabs" class="tabs" aria-label="Tabs">
+    <button class="btn small tab-active" id="tabbtn-device" type="button">DEVICE</button>
+    <button class="btn small" id="tabbtn-live" type="button">LIVE</button>
+    <button class="btn small" id="tabbtn-visual" type="button">VISUAL</button>
+    <span id="linkpill" class="pill off">FM-1: not connected</span>
+  </nav>
 
   <section id="project" aria-label="Projet">
     <div class="label">PROJECT <span id="autosaved">kept in this browser</span></div>
@@ -72,16 +37,102 @@
       <button class="btn small" id="btnPaste" type="button">PASTE CODE</button>
       <button class="btn small" id="btnNew" type="button">NEW</button>
     </div>
+    <div class="label demos">DEMOS <span>a project of each, in this page (press twice)</span></div>
+    <div id="demobtns">
+      <button class="btn small" id="demoNeon" type="button" title="NEON GRID: a dark cyberpunk breakbeat in D phrygian, 150 BPM, made to remix live">NEON GRID</button>
+      <button class="btn small" id="demoTribe" type="button" title="TRIBE: a hypnotic tribal techno, 130 BPM">TRIBE</button>
+      <button class="btn small" id="demoAcid" type="button" title="ACID BREAK: minimal techno with a chiptune pluck and a break beat, 140 BPM">ACID BREAK</button>
+    </div>
     <div id="pastebox" hidden>
       <textarea id="code" rows="4" spellcheck="false" autocomplete="off" placeholder="Paste a project code here"></textarea>
       <button class="btn small" id="btnCodeLoad" type="button">LOAD THIS CODE</button>
     </div>
+  </section>
+
+  <!-- ================================================================ DEVICE -->
+  <section id="tab-device" class="tab" aria-label="Device">
+    <div class="cols">
+      <div class="card">
+        <h2>Connect</h2>
+        <p class="hint">Plug the FM-1 in USB, running the MSQ-80 firmware (m2.59 or later). Chrome or Edge, then allow MIDI SysEx access.</p>
+        <button id="d-connect" class="btn big" type="button">Connect to the FM-1</button>
+        <div class="ports">
+          <label>MIDI out <select id="d-out"></select></label>
+          <label>MIDI in <select id="d-in"></select></label>
+        </div>
+        <dl id="d-info" class="info"></dl>
+      </div>
+      <div class="card">
+        <h2>Transfer</h2>
+        <label class="slot">Project slot on the FM-1
+          <select id="d-slot"><option value="0">1</option><option value="1">2</option><option value="2">3</option></select></label>
+        <div class="grid2">
+          <button id="d-send" class="btn acc" type="button" disabled title="The project of this page into the slot, and the FM-1 loads it">Send this page's project</button>
+          <button id="d-read" class="btn" type="button" disabled title="The FM-1 saves what it plays into its slot, and this page takes it">Read the FM-1's project</button>
+          <button id="d-save" class="btn" type="button" disabled title="Keep what the FM-1 plays in its slot (SAVE twice on the FM-1)">Save on the FM-1</button>
+          <button id="d-play" class="btn" type="button" disabled>Play on the FM-1</button>
+          <button id="d-stop" class="btn" type="button" disabled>Stop</button>
+          <button id="d-test" class="btn" type="button" disabled title="A few requests of every kind, timed, into the log">Test link</button>
+        </div>
+        <div class="progress"><div id="d-bar"></div></div>
+        <div id="d-status" class="hint">Idle.</div>
+        <p class="hint">A demo or a project sent is written to a slot of the FM-1's flash and stays after power-off: the project saved last is the one the FM-1 starts with. Sending takes a few seconds (the FM-1 stops playing meanwhile). Pick a demo above, send it, and it plays on the FM-1 with its own kit.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Log</h2>
+      <pre id="d-log" class="log"></pre>
+    </div>
+  </section>
+
+  <!-- ================================================================ LIVE -->
+  <section id="tab-live" class="tab" aria-label="Live" hidden>
+    <div class="card live">
+      <h2>FM-1 live <small id="l-status">Connect the FM-1 (DEVICE tab) to see its screen here.</small></h2>
+      <canvas id="l-panel"></canvas>
+      <p class="hint">The FM-1's own screen and lights, as they change. The panel plays the FM-1 too: click or touch the buttons and keys (several fingers at once, slide across the keys), drag or scroll the knobs. Right-click or Shift-click a button to hold it (SEL + a key, with one mouse); click it again to let go. MASTER stays on the device.</p>
+      <p class="hint"><b>Keyboard</b>: arrows: up / down SELECT, left / right ALGORITHM · Tab / Shift+Tab PRESETS · Space PLAY · Enter REC · Shift SEL · Delete ARP · Backspace SEL + SAVE · F1-F5 HOME EDIT GLO FX SEQ · Z / X OCT- / OCT+ · PgUp/PgDn K1 · Home/End K2 · + / - K3 · * / / K4 · the two letter rows (Q W E R… / A S D F…) and the number row play the keys.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ VISUAL: the emulator's own views, kept apart -->
+  <section id="tab-visual" class="tab" aria-label="Visual" hidden>
+    <div id="touchview">
+      <div id="screenwrap">
+        <canvas id="screen" width="240" height="240"></canvas>
+        <button class="js-start" id="start" type="button">TAP TO START</button>
+      </div>
+
+      <nav id="pages" aria-label="Pages"></nav>
+
+      <section id="transport" aria-label="Transport"></section>
+
+      <section id="nav" aria-label="Navigation">
+        <div id="dpad"></div>
+        <div id="mods"></div>
+      </section>
+
+      <section id="shortcuts" aria-label="Raccourcis"></section>
+
+      <section id="keys" aria-label="Clavier">
+        <div id="pianobar"></div>
+        <div id="piano"></div>
+        <div id="pads"></div>
+      </section>
+    </div>
+
+    <div id="panelview" hidden>
+      <div id="stage"><div id="device"></div></div>
+    </div>
+
     <p class="hint">PC: Z S X D C V G B H N J M play, Q 2 W 3 E R 5 T… an octave up. Arrows, Space, F1-F11, Ctrl+S / Ctrl+O.</p>
   </section>
 
   <input type="file" id="file" accept=".msq8,.txt,application/octet-stream,text/plain" hidden>
 </div>
+<script src="link.js"></script>
 <script src="panel.js"></script>
+<script src="device.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

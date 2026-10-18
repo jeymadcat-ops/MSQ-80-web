@@ -299,7 +299,6 @@
       A.$('vPanel').classList.toggle('tab-active', v === 'panel');
       A.$('vTouch').classList.toggle('tab-active', v === 'touch');
       try { window.localStorage.setItem(VIEW_KEY, v); } catch (e) { /* ok */ }
-      if (A.onView) A.onView(v);
       if (v === 'panel') { shown = -1; fit(); }
     }
 

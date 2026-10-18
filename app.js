@@ -10,12 +10,10 @@
   function F(n) { return 15 + n; }                               // F1 = 16 ... F11 = 26
   var PAGE = { SOUND: 0, SEQ: 1, NRV8: 2, SONG: 3, FX: 4 };
   var PAGE_TABS = [['SOUND', PAGE.SOUND], ['SEQ', PAGE.SEQ], ['SONG', PAGE.SONG], ['NRV8', PAGE.NRV8], ['FX', PAGE.FX]];
-  var VOICE_NAMES = ['KICK', 'SNARE', 'HAT', 'CLAP', 'CAN', 'TOM', 'NUT', 'SYN'];
+  var VOICE_NAMES = ['KICK', 'SNARE', 'HAT', 'CLAP', 'CY', 'TOM', 'NUT', 'SYN'];
   var STUTTER_NAMES = ['1/4', '1/8', '1/16', '1/32', 'REVERSE', 'GRAINS', 'SPIN ▼', 'SPIN ▲'];
   var AUTOSAVE_KEY = 'msq8-autosave';
   var THEME_KEY = 'msq8-theme';
-  var DECK_KEY = 'msq8-deck';
-  var SHORT_PER_SET = 8;                                         // the shortcut buttons shown at once in the FUNC drawer
 
   function $(id) { return document.getElementById(id); }
 
@@ -23,7 +21,6 @@
   var ctx = null;                                                // the audio context
   var mods = { shift: false, ctrl: false };                      // the latched SHIFT / CTRL of the touch d-pad
   var shownPage = -1;
-  var shortIdx = {};                                             // page -> which set of shortcuts the FUNC drawer shows
 
   // ------------------------------------------------------------------ the engine
   function b64ToBytes(s) {
@@ -259,7 +256,8 @@
   var SHORT = {};
   SHORT[PAGE.SOUND] = [
     ['PROG −', K.TAB, 1, 0, 0, 'track'], ['PROG +', K.TAB, 0, 0, 0, 'track'], ['TRACK −', F(3), 0, 0, 0, ''], ['TRACK +', F(4), 0, 0, 0, ''],
-    ['RANDOM', F(11), 0, 0, 0, 'new sound'], ['OCT −', K.PGDN, 0, 0, 0, ''], ['OCT +', K.PGUP, 0, 0, 0, ''], ['MUTE', F(6), 0, 0, 0, 'track']
+    ['RANDOM', F(11), 0, 0, 0, 'new sound'], ['OCT −', K.PGDN, 0, 0, 0, ''], ['OCT +', K.PGUP, 0, 0, 0, ''], ['MUTE', F(6), 0, 0, 0, 'track'],
+    ['LIB −', K.LEFT, 0, 1, 0, 'library'], ['LIB +', K.RIGHT, 0, 1, 0, 'library'], ['GROUP −', K.LEFT, 1, 1, 0, 'bass lead pad'], ['GROUP +', K.RIGHT, 1, 1, 0, 'bass lead pad']
   ];
   SHORT[PAGE.SEQ] = [
     ['MUTE', F(6), 0, 0, 0, 'track'], ['QUANT', F(7), 0, 0, 0, 'track'], ['GRID', F(7), 1, 0, 0, 'value'], ['LOOP', F(8), 0, 0, 0, ''],
@@ -296,55 +294,11 @@
       press(b, function (r) { key(s[1], s[2], s[3], r); }, null, !!s[4]);
       box.appendChild(b);
     });
-    showShortcutSet(page);
   }
 
-  // the FUNC drawer shows the page's shortcuts eight at a time, so it never scrolls; MORE turns the set
-  function showShortcutSet(page) {
-    var list = $('shortcuts').children, sets = Math.max(1, Math.ceil(list.length / SHORT_PER_SET)), idx = (shortIdx[page] || 0) % sets, i;
-    shortIdx[page] = idx;
-    for (i = 0; i < list.length; ++i) list[i].hidden = Math.floor(i / SHORT_PER_SET) !== idx;
-    var more = $('more');
-    more.textContent = 'MORE ▸  ' + (idx + 1) + '/' + sets;
-    more.hidden = sets < 2;
-  }
-
-  // ---- the drawer under the transport: one of NAV, FUNC, KEYS (PADS on the drum pages), FILE
-  function setDeck(name) {
-    var secs = $('deck').children, tabs = $('decktabs').children, i;
-    for (i = 0; i < secs.length; ++i) secs[i].hidden = secs[i].dataset.deck !== name;
-    for (i = 0; i < tabs.length; ++i) tabs[i].classList.toggle('tab-active', tabs[i].dataset.deck === name);
-    try { window.localStorage.setItem(DECK_KEY, name); } catch (e) { /* ok */ }
-  }
-
-  function wireDeck() {
-    var tabs = $('decktabs').children, saved = null, i;
-    for (i = 0; i < tabs.length; ++i) (function (t) {
-      t.addEventListener('click', function () { setDeck(t.dataset.deck); });
-    })(tabs[i]);
-    $('more').addEventListener('click', function () {
-      shortIdx[shownPage] = (shortIdx[shownPage] || 0) + 1;
-      showShortcutSet(shownPage);
-    });
-    try { saved = window.localStorage.getItem(DECK_KEY); } catch (e) { /* ok */ }
-    setDeck(/^(nav|func|keys|file)$/.test(saved) ? saved : 'nav');
-  }
-
-  // The view shown (touch or panel, panel.js switches): the touch view fills the screen, the project goes in its FILE drawer
-  function onView(v) {
-    var touch = v === 'touch', proj = $('project');
-    document.body.classList.toggle('v-touch', touch);
-    if (touch) $('deckfile').appendChild(proj);
-    else $('panelview').parentNode.insertBefore(proj, $('panelview').nextSibling);
-  }
-
-  // ---- the keyboard: two octaves and a C, from the keyboard octave of the engine (OCT ± moves it): the front panel's
+  // ---- the keyboard: two octaves and a C, from the keyboard octave of the engine (OCT ± moves it)
   var WHITE = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24];
   var BLACK = { 1: 0, 3: 1, 6: 3, 8: 4, 10: 5, 13: 7, 15: 8, 18: 10, 20: 11, 22: 12 };   // semitone -> index of the white key before it
-  // The touch view's keyboard, drawn like the FM-1's: an octave from F to F, the white keys a row of pills and the black
-  // ones a row above them, three on the left and two on the right. [semitone, white keys before it]
-  var TOUCH_WHITE = [5, 7, 9, 11, 12, 14, 16, 17];
-  var TOUCH_BLACK = [[6, 1], [8, 2], [10, 3], [13, 5], [15, 6]];
   var NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   var heldTouch = {};                                            // pointerId -> note
 
@@ -374,18 +328,17 @@
   }
 
   function buildPiano() {
-    var piano = $('piano'), pitch = 100 / TOUCH_WHITE.length, kw = pitch * 0.82;
-    TOUCH_WHITE.forEach(function (semi, i) {
-      var k = mk('div', 'white', NOTE_NAMES[semi % 12]);
+    var piano = $('piano'), w = 100 / WHITE.length;
+    WHITE.forEach(function (semi, i) {
+      var k = mk('div', 'white', semi % 12 === 0 ? 'C' + (semi / 12) : '');
       k.dataset.semi = semi;
-      k.style.left = (i * pitch + (pitch - kw) / 2) + '%'; k.style.width = kw + '%';
       attachKey(k, semi);
       piano.appendChild(k);
     });
-    TOUCH_BLACK.forEach(function (b) {
-      var k = mk('div', 'black');
-      k.style.left = (b[1] * pitch - kw / 2) + '%'; k.style.width = kw + '%';
-      attachKey(k, b[0]);
+    Object.keys(BLACK).forEach(function (s) {
+      var semi = +s, k = mk('div', 'black');
+      k.style.left = ((BLACK[s] + 1) * w - 2.7) + '%';
+      attachKey(k, semi);
       piano.appendChild(k);
     });
     var bar = $('pianobar');
@@ -426,12 +379,11 @@
       $('pads').style.display = drums ? 'grid' : 'none';
       $('piano').style.display = drums ? 'none' : 'flex';
       $('pianobar').style.display = drums ? 'none' : 'grid';
-      $('tabKeys').textContent = drums ? 'PADS' : 'KEYS';
     }
     $('btnPlay').classList.toggle('live', !!playing);
     $('btnPlay').textContent = playing ? '■' : '▶';
     $('btnRec').classList.toggle('rec', !!rec);
-    $('octlabel').textContent = 'KEYS F' + x.msq_web_state(1) + ' TO F' + (x.msq_web_state(1) + 1);
+    $('octlabel').textContent = 'KEYS FROM C' + x.msq_web_state(1);
   }
 
   // ------------------------------------------------------------------ the PC keyboard
@@ -612,32 +564,10 @@
     });
   }
 
-  // ------------------------------------------------------------------ full screen
-  // The page alone on the screen, without the browser's bars. Where the browser cannot (an iPhone's Safari), the button
-  // stays hidden: there, "Add to Home Screen" opens the page without bars.
-  function fullElement() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
-
-  function wireFullscreen() {
-    var b = $('btnFull'), root = document.documentElement;
-    var enter = root.requestFullscreen || root.webkitRequestFullscreen, leave = document.exitFullscreen || document.webkitExitFullscreen;
-    if (!enter || !leave || document.fullscreenEnabled === false || document.webkitFullscreenEnabled === false) return;
-    b.hidden = false;
-    function shown() { var on = !!fullElement(); b.classList.toggle('tab-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }
-    b.addEventListener('click', function () {
-      ensureAudio();
-      try {
-        var r = fullElement() ? leave.call(document) : enter.call(root, { navigationUI: 'hide' });
-        if (r && r.catch) r.catch(function () { /* refused: the page stays as it is */ });
-      } catch (e) { /* refused */ }
-    });
-    document.addEventListener('fullscreenchange', shown);
-    document.addEventListener('webkitfullscreenchange', shown);
-  }
-
   // ------------------------------------------------------------------ start
   function start() {
     addScreen($('screen'));
-    buildFixed(); buildPiano(); buildPads(); wireFiles(); wireDeck(); wireFullscreen();
+    buildFixed(); buildPiano(); buildPads(); wireFiles();
     $('start').addEventListener('pointerdown', function (ev) { ev.preventDefault(); ensureAudio(); });
     $('btnTheme').addEventListener('click', function () { if (x) applyTheme(storedTheme() + 1 >= 2 ? 0 : storedTheme() + 1); });
     window.addEventListener('keydown', onKeyDown);
@@ -654,9 +584,11 @@
     window.msqApp = {                                                              // what the panel view (panel.js) builds on
       K: K, F: F, PAGE: PAGE, VOICE_NAMES: VOICE_NAMES, STUTTER_NAMES: STUTTER_NAMES, SHORT: SHORT, mods: mods, WHITE: WHITE, BLACK: BLACK,
       $: $, mk: mk, press: press, key: key, attachKey: attachKey, toggleMod: toggleMod, releaseMods: releaseMods, addScreen: addScreen,
-      exports: function () { return x; }, mem: mem, ensureAudio: ensureAudio, onFrame: function (fn) { frameHooks.push(fn); }, onView: onView
+      exports: function () { return x; }, mem: mem, ensureAudio: ensureAudio, onFrame: function (fn) { frameHooks.push(fn); },
+      projectBytes: projectBytes, loadBytes: loadBytes, autosave: autosave                          // the project of the page, for the DEVICE tab
     };
-    if (window.msqPanelInit) window.msqPanelInit(window.msqApp); else onView('touch');
+    if (window.msqPanelInit) window.msqPanelInit(window.msqApp);
+    if (window.msqDeviceInit) window.msqDeviceInit(window.msqApp);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

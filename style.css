@@ -95,36 +95,30 @@ header {
 #pages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 8px; }
 #transport { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 8px; }
 
-#nav { display: grid; grid-template-columns: 1fr 96px; gap: 8px; align-items: stretch; }
+#nav { display: grid; grid-template-columns: 1fr 96px; gap: 8px; margin-top: 8px; align-items: stretch; }
 #dpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 50px);
   gap: 6px;
 }
 #dpad .btn { min-height: 0; font-size: 18px; }
 #mods { display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 6px; }
-#mods .btn { min-height: 0; }
 
-#func { display: flex; flex-direction: column; gap: 6px; }
-#shortcuts { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; gap: 6px; }
-#shortcuts .btn { min-height: 0; padding-inline: 2px; }
-#more { flex: none; color: var(--dim); }
+#shortcuts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
 #shortcuts .btn { font-size: 11px; line-height: 1.15; }
 #shortcuts .btn small { display: block; color: var(--dim); font-weight: 500; font-size: 9px; margin-top: 2px; }
 #shortcuts .btn.on small { color: var(--amber); }
 
-#keys { display: flex; flex-direction: column; }
-#pianobar { flex: none; display: grid; grid-template-columns: 70px 1fr 70px; gap: 6px; align-items: center; margin-bottom: 6px; }
+#keys { margin-top: 10px; }
+#pianobar { display: grid; grid-template-columns: 70px 1fr 70px; gap: 6px; align-items: center; margin-bottom: 6px; }
 #pianobar .mid { text-align: center; color: var(--dim); font-size: 11px; }
-#pianobar .btn { min-height: 30px; }
+#pianobar .btn { min-height: 34px; }
 
 #piano {
   position: relative;
   display: flex;
-  flex: 1;
-  min-height: 70px;
-  max-height: 112px;
+  height: 132px;
   touch-action: none;
 }
 .white {
@@ -153,16 +147,11 @@ header {
   touch-action: none;
 }
 .black.on { background: var(--amber); }
-/* the touch keyboard, like the FM-1's: pills, the black keys in a row above the white ones */
-#piano .white, #piano .black { position: absolute; border-radius: 999px; padding: 0; }
-#piano .white { top: 44%; bottom: 0; flex: none; padding-bottom: 6px; border-color: #9aa3bd; }
-#piano .black { top: 0; height: 38%; background: #2a3150; border-color: #4a5580; }
-#piano .black.on { background: var(--amber); }
 
 #pads, #stutters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-#pads { display: none; flex: 1; min-height: 0; grid-template-rows: 1fr 1fr auto 1fr 1fr; }
-#pads .label { grid-column: 1 / -1; color: var(--dim); font-size: 10px; letter-spacing: .1em; margin: 2px 0 -2px; }
-#pads .btn { min-height: 0; font-size: 12px; padding-block: 2px; }
+#pads { display: none; }
+#pads .label { grid-column: 1 / -1; color: var(--dim); font-size: 10px; letter-spacing: .1em; margin: 6px 0 -2px; }
+#pads .btn { min-height: 58px; font-size: 12px; }
 .pad0 { border-bottom: 4px solid #eb5046; }
 .pad1 { border-bottom: 4px solid #f0963c; }
 .pad2 { border-bottom: 4px solid #ebd746; }
@@ -177,60 +166,6 @@ header {
 
 @media (min-width: 700px) {
   #app { max-width: 560px; }
-}
-
-/* ---------------------------------------------------------------- the touch view: one screen, nothing to scroll
-   The synth's screen takes the room left over (a square, as big as fits), the pages and the transport sit under it,
-   and the drawer at the bottom shows one of NAV, FUNC, KEYS / PADS, FILE. */
-body.v-touch { overflow: hidden; }
-body.v-touch #app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  padding-block: max(6px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-bottom, 0px));
-  padding-inline: max(10px, env(safe-area-inset-left, 0px)) max(10px, env(safe-area-inset-right, 0px));
-}
-body.v-touch header { flex: none; padding: 0 0 6px; }
-#touchview { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; container-type: inline-size; }
-#touchview > * { flex: none; }
-#touchview #pages, #touchview #transport { margin-top: 0; }
-#touchview #pages .btn, #touchview #transport .btn { min-height: 38px; padding-block: 2px; }
-
-/* the screen goes first, as wide as the page; it gives up height only when the drawer would get under 150 px */
-#touchview #screenwrap { height: max(160px, min(100cqw, calc(100dvh - 340px))); container-type: size; }
-#touchview #screen, #touchview #start {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: min(100cqw, 100cqh);
-  height: min(100cqw, 100cqh);
-}
-#touchview #start { font-size: 18px; }
-
-#decktabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-#decktabs .btn { min-height: 30px; }
-#touchview #deck { flex: 1; min-height: 0; max-height: 300px; }
-#deck > * { height: 100%; }
-#deckfile { overflow-y: auto; }
-#deckfile #project { margin-top: 2px; }
-#deckfile #projbtns { grid-template-columns: repeat(3, 1fr); }
-#deckfile #projbtns .btn { min-height: 44px; font-size: 11px; }
-
-/* a phone on its side: the screen on the left, the controls on the right */
-@media (orientation: landscape) and (max-height: 520px) {
-  body.v-touch #app { max-width: none; }
-  #touchview { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto auto 1fr; column-gap: 10px; row-gap: 5px; }
-  #touchview #screenwrap { grid-row: 1 / -1; width: min(50vw, calc(100dvh - 64px)); height: auto; min-height: 0; }
-  #touchview #pages .btn, #touchview #transport .btn { min-height: 34px; }
-  #decktabs .btn { min-height: 28px; }
-  #touchview #deck { max-height: none; }
-  #mods { grid-template-rows: 1fr 1fr 1fr; }
-}
-
-/* a finger, not a PC keyboard: the PC keys hint is no use */
-@media (pointer: coarse) {
-  .hint { display: none; }
 }
 
 #project { margin-top: 14px; }
@@ -255,7 +190,6 @@ body.v-touch header { flex: none; padding: 0 0 6px; }
 
 /* ---------------------------------------------------------------- the front panel view */
 .views { display: flex; gap: 6px; }
-#btnFull { padding-inline: 10px; font-size: 16px; line-height: 1; }
 #panelview { margin-top: 4px; }
 #stage { position: relative; width: 100%; overflow: hidden; }
 #device {
@@ -372,3 +306,34 @@ body.sq80 .btn.tab-active { color: #02060f; }
 body.sq80 .ptr, body.sq80 .dot { stroke: #4f9bff; fill: #4f9bff; }
 body.sq80 .ptr { fill: none; }
 body.sq80 .pad0, body.sq80 .pad1, body.sq80 .pad2, body.sq80 .pad3, body.sq80 .pad4, body.sq80 .pad5, body.sq80 .pad6, body.sq80 .pad7 { border-bottom-color: #3a78d8; }
+
+/* ------------------------------------------------------------------ the editor: tabs, the DEVICE and LIVE tabs */
+#app[data-tab="device"], #app[data-tab="live"] { max-width: 1040px; }
+.tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 2px 0 10px; }
+.pill { margin-left: auto; padding: 5px 10px; border-radius: 999px; font-size: 11px; letter-spacing: .04em; background: #17382a; color: var(--green); border: 1px solid var(--green); }
+.pill.off { background: var(--key); color: var(--dim); border-color: var(--key-edge); }
+#app:not([data-tab="visual"]) .viewonly { display: none; }
+.tab { display: block; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.card { background: var(--panel); border: 1px solid var(--key-edge); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; -webkit-user-select: text; user-select: text; }
+.cols .card { margin-bottom: 0; }
+.card h2 { margin: 0 0 8px; font-size: 14px; letter-spacing: .06em; color: var(--amber); }
+.card h2 small { color: var(--dim); font-weight: 600; letter-spacing: 0; margin-left: 8px; }
+.hint { color: var(--dim); font-size: 12px; line-height: 1.45; margin: 6px 0; font-weight: 500; }
+.btn.big { width: 100%; min-height: 48px; font-size: 14px; touch-action: manipulation; }
+.btn.acc { border-color: var(--amber); color: var(--amber); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn { touch-action: manipulation; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+.ports { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; }
+.ports label, label.slot { display: block; color: var(--dim); font-size: 11px; }
+.ports select, label.slot select { width: 100%; margin-top: 3px; padding: 7px; background: var(--key); color: var(--text); border: 1px solid var(--key-edge); border-radius: 8px; font: inherit; }
+label.slot select { width: 100%; }
+.info { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 8px 0 0; font-size: 12px; }
+.info dt { color: var(--dim); } .info dd { margin: 0; }
+.progress { height: 8px; background: var(--key); border-radius: 4px; overflow: hidden; margin: 8px 0 4px; }
+.progress div { height: 100%; width: 0; background: var(--amber); transition: width .1s linear; }
+.log { height: 170px; overflow: auto; margin: 0; padding: 8px; background: #070914; border-radius: 8px; color: #9fb0d0; font: 12px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; }
+#l-panel { display: block; width: 100%; background: #0e1014; border-radius: 12px; }
+.demos { margin-top: 10px; }
+#demobtns { display: flex; flex-wrap: wrap; gap: 6px; }
