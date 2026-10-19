@@ -302,7 +302,7 @@
   var NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   var heldTouch = {};                                            // pointerId -> note
 
-  function noteFor(semi) { return 12 * x.msq_web_state(1) + 12 + semi; }
+  function noteFor(semi) { return x.msq_web_state(10) + semi; }
 
   function attachKey(el, semi) {
     el.addEventListener('pointerdown', function (ev) {
@@ -383,7 +383,7 @@
     $('btnPlay').classList.toggle('live', !!playing);
     $('btnPlay').textContent = playing ? '■' : '▶';
     $('btnRec').classList.toggle('rec', !!rec);
-    $('octlabel').textContent = 'KEYS FROM C' + x.msq_web_state(1);
+    $('octlabel').textContent = 'KEYS FROM C' + (x.msq_web_state(10) / 12 - 1);
   }
 
   // ------------------------------------------------------------------ the PC keyboard
