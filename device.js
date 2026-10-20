@@ -6,7 +6,7 @@
   var L = window.MsqLink;
 
   var BTN = ['FX', 'SEL', 'ENV', 'LFO', 'EDIT', 'GLO', 'HOME', 'SAVE', 'ARP', 'SEQ', 'PLAY', 'REC', 'OCT-', 'OCT+'];
-  var BTN_FUNC = ['LAYER', 'SHIFT', 'ENVELOPES', 'CTRL', 'SOUND', 'MIXER', 'TRACK', 'SAVE/LOAD', 'ARP', 'SEQUENCERS', '', '', '', ''];
+  var BTN_FUNC = ['LAYER', 'SHIFT', 'ENVELOPES', 'CTRL / LFO TAB', 'SQ80 EDIT', 'MIXER', 'TRACK', 'SAVE/LOAD', 'ARP', 'SEQUENCERS', '', '', '', ''];
   var KNOBS = [[105, 100, 24, 'MASTER'], [215, 100, 24, 'SELECT'], [105, 205, 24, 'PRESETS'], [215, 205, 24, 'ALGORITHM'],
     [610, 100, 22, 'KNOB1'], [714, 100, 22, 'KNOB2'], [818, 100, 22, 'KNOB3'], [922, 100, 22, 'KNOB4']];
   var WHITE = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26];

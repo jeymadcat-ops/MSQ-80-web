@@ -9,7 +9,7 @@
             HOME: 12, END: 13, PGUP: 14, PGDN: 15 };
   function F(n) { return 15 + n; }                               // F1 = 16 ... F11 = 26
   var PAGE = { SOUND: 0, SEQ: 1, NRV8: 2, SONG: 3, FX: 4 };
-  var PAGE_TABS = [['SOUND', PAGE.SOUND], ['SEQ', PAGE.SEQ], ['SONG', PAGE.SONG], ['NRV8', PAGE.NRV8], ['FX', PAGE.FX]];
+  var PAGE_TABS = [['SQ80 EDIT', PAGE.SOUND], ['SQ80 SEQ', PAGE.SEQ], ['SONG', PAGE.SONG], ['NRV8', PAGE.NRV8], ['FX', PAGE.FX]];
   var VOICE_NAMES = ['KICK', 'SNARE', 'HAT', 'CLAP', 'CY', 'TOM', 'NUT', 'SYN'];
   var STUTTER_NAMES = ['1/4', '1/8', '1/16', '1/32', 'REVERSE', 'GRAINS', 'SPIN ▼', 'SPIN ▲'];
   var AUTOSAVE_KEY = 'msq8-autosave';

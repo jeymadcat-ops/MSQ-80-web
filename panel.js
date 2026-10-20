@@ -154,7 +154,7 @@
       pbtn('PANIC', x0 + 7 * pitch, 420, w, h, send(K.ESC, false, false), false).classList.add('warn');
 
       legend('PAGES', x0, 474);
-      [['SOUND', PAGE.SOUND], ['SEQ', PAGE.SEQ], ['SONG', PAGE.SONG], ['NRV8', PAGE.NRV8], ['FX', PAGE.FX]].forEach(function (p, n) {
+      [['SQ80 EDIT', PAGE.SOUND], ['SQ80 SEQ', PAGE.SEQ], ['SONG', PAGE.SONG], ['NRV8', PAGE.NRV8], ['FX', PAGE.FX]].forEach(function (p, n) {
         pbtn(p[0], x0 + n * pitch, 490, w, h, function () { X().msq_web_page(p[1]); }, false, function () { return X().msq_web_state(0) === p[1]; }, 'amber');
       });
       pbtn('TRACK −', x0 + 5 * pitch, 490, w, h, send(F(3), false, false), false);
